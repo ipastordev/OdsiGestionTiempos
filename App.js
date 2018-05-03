@@ -80,8 +80,8 @@ export default class Asignaturas extends React.Component {
                   <Card>
                       <ListItem
                           centerElement={{
-                              primaryText: item.IdAsignatura,
-                              secondaryText: 'Descripción',
+                              primaryText: item.Nombre_asignatura,
+                              secondaryText: item.Descripcion,
                           }}
                       />
                   </Card>
