@@ -1,11 +1,12 @@
 import React from 'react';
-import { FlatList, ActivityIndicator, Text, View, StyleSheet, StatusBar } from 'react-native';
-import { COLOR, ThemeProvider, Toolbar, Subheader, Card, ListItem } from 'react-native-material-ui';
+import { FlatList, ActivityIndicator, Text, View, StyleSheet, StatusBar, Modal } from 'react-native';
+import { COLOR, ThemeProvider, Toolbar, Subheader, Card, ListItem, 
+          ActionButton, Dialog, DialogDefaultActions } from 'react-native-material-ui';
 
 const uiTheme = {
     palette: {
-        primaryColor: COLOR.green500,
-        accentColor: COLOR.pink500,
+        primaryColor: COLOR.teal300,
+        accentColor: COLOR.red500,
     },
 };
 
@@ -15,15 +16,15 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         paddingHorizontal: 16,
-        paddingBottom: 16,
-    },
+        paddingBottom: 16
+    }
 });
 
 export default class Asignaturas extends React.Component {
 
   constructor(props){
     super(props);
-    this.state ={ isLoading: true}
+    this.state ={ isLoading: true, showNewDialog: false}
   }
 
   componentDidMount(){
@@ -71,13 +72,13 @@ export default class Asignaturas extends React.Component {
         <ThemeProvider uiTheme={uiTheme}>
           <View style={{flex: 1}}>
             <View style={styles.container}>
-              <Toolbar centerElement="Asignaturas" />
+              <Toolbar centerElement="Gestor de Tiempos" />
             </View>
             <View style={{flex: 1}}>
               <FlatList
                 data={this.state.dataSource}
                 renderItem={({item}) => 
-                  <Card>
+                  <Card style={{ titleText: { color: 'rgba(200,0,0,.87)' },}}>
                       <ListItem
                           centerElement={{
                               primaryText: item.Nombre_asignatura,
@@ -86,9 +87,42 @@ export default class Asignaturas extends React.Component {
                       />
                   </Card>
                 }
-                keyExtractor={(item, index) => 'index'}
+                keyExtractor={(item, index) => 'item'+index}
               />
             </View>
+            <Modal
+              transparent={true}
+              visible={this.state.showNewDialog}
+              onRequestClose={() => {
+                alert('Modal has been closed.');
+              }}>
+              <View style={{marginTop: 22}}>
+                <Dialog>
+                <Dialog.Title><Text>Nueva asignatura</Text></Dialog.Title>
+                <Dialog.Content>
+                  <Text>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  </Text>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <DialogDefaultActions
+                     actions={['cancelar', 'guardar']}
+                     options={{ ok: { disabled: true } }}
+                     onActionPress={(action) => {
+                        if(action === 'cancelar'){
+                          this.setState({ showNewDialog: false })
+                        }else if(action === 'guardar'){
+                          this.setState({ showNewDialog: false })
+                        }
+                     }}
+                  />
+                </Dialog.Actions>
+              </Dialog>
+              </View>
+            </Modal>
+            <ActionButton onPress={() => this.setState({ showNewDialog: true })}/>
+            
+            
           </View>
         </ThemeProvider>
       </View>
