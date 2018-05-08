@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Button } from 'react-native';
-import { TitledInput } from '../component';
+import  TitledInput  from '../component/TitledInput';
 
 class LoginForm extends Component {
     state = { email: '', password: '' };
