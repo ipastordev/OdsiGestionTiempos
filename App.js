@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, ActivityIndicator, Text, View, StyleSheet, StatusBar, Modal } from 'react-native';
+import { FlatList, ActivityIndicator, Text, View, StyleSheet, StatusBar, Modal, TextInput} from 'react-native';
 import { COLOR, ThemeProvider, Toolbar, Subheader, Card, ListItem, 
           ActionButton, Dialog, DialogDefaultActions } from 'react-native-material-ui';
 
@@ -12,12 +12,18 @@ const uiTheme = {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 20,
+        paddingTop: 24,
     },
     textContainer: {
         paddingHorizontal: 16,
         paddingBottom: 16
-    }
+    },
+    dialogContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(52, 52, 52, 0.4)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
 
 export default class Asignaturas extends React.Component {
@@ -52,6 +58,31 @@ export default class Asignaturas extends React.Component {
       });
   }
 
+  saveNew() {
+    
+    jsonArray = this.state.dataSource
+    jsonArray.push(
+      {
+        Nombre_asignatura: this.state.abreviatura,
+        Descripcion: this.state.nombre
+      })
+    console.log(jsonArray)
+    this.setState({ showNewDialog: false})
+
+    return fetch('https://us-central1-odsi-gestiontiempos.cloudfunctions.net/asignaturas/addAsignatura', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        idAsignatura: this.state.abreviatura,
+        idNombre: this.state.abreviatura,
+        idDescripcion: this.state.nombre
+      }),
+    }).then(response => this.setState({ showNewDialog: false, dataSource: jsonArray }), alert('SAVED'))
+  }
+
 
 
   render(){
@@ -78,7 +109,7 @@ export default class Asignaturas extends React.Component {
               <FlatList
                 data={this.state.dataSource}
                 renderItem={({item}) => 
-                  <Card style={{ titleText: { color: 'rgba(200,0,0,.87)' },}}>
+                  <Card>
                       <ListItem
                           centerElement={{
                               primaryText: item.Nombre_asignatura,
@@ -96,13 +127,16 @@ export default class Asignaturas extends React.Component {
               onRequestClose={() => {
                 alert('Modal has been closed.');
               }}>
-              <View style={{marginTop: 22}}>
+              <View style={styles.dialogContainer}>
                 <Dialog>
                 <Dialog.Title><Text>Nueva asignatura</Text></Dialog.Title>
                 <Dialog.Content>
-                  <Text>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </Text>
+                  <Text>Abreviatura</Text>
+                  <TextInput value={this.state.abreviatura} onChangeText={(text) => this.setState({abreviatura: text})} maxLength={5}/>
+                  <Text>Nombre</Text>
+                  <TextInput value={this.state.nombre} onChangeText={(text) => this.setState({nombre: text})}/>
+                  <Text>Alumnos</Text>
+                  <TextInput value={this.state.alumnos} onChangeText={(text) => this.setState({alumnos: text})}/>
                 </Dialog.Content>
                 <Dialog.Actions>
                   <DialogDefaultActions
@@ -112,7 +146,7 @@ export default class Asignaturas extends React.Component {
                         if(action === 'cancelar'){
                           this.setState({ showNewDialog: false })
                         }else if(action === 'guardar'){
-                          this.setState({ showNewDialog: false })
+                          this.saveNew()
                         }
                      }}
                   />
@@ -120,8 +154,7 @@ export default class Asignaturas extends React.Component {
               </Dialog>
               </View>
             </Modal>
-            <ActionButton onPress={() => this.setState({ showNewDialog: true })}/>
-            
+            <ActionButton onPress={() => this.setState({ showNewDialog: true, abreviatura: null, nombre: null, alumnos: null })}/>
             
           </View>
         </ThemeProvider>
