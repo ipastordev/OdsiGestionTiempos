@@ -3,6 +3,8 @@ import { FlatList, ActivityIndicator, Text, View, StyleSheet, StatusBar, Modal, 
 import { COLOR, ThemeProvider, Toolbar, Subheader, Card, ListItem, 
           ActionButton, Dialog, DialogDefaultActions } from 'react-native-material-ui';
 
+const user = "us6"
+
 const uiTheme = {
     palette: {
         primaryColor: COLOR.teal300,
@@ -24,6 +26,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    activityIndicator: {
+        flex: 1,
+        justifyContent: 'center'
+    },
 });
 
 export default class Asignaturas extends React.Component {
@@ -34,7 +40,7 @@ export default class Asignaturas extends React.Component {
   }
 
   componentDidMount(){
-    return fetch('https://us-central1-odsi-gestiontiempos.cloudfunctions.net/usuariosAsignaturas/usuario-asignatura?idUsuario=us6',
+    return fetch('https://us-central1-odsi-gestiontiempos.cloudfunctions.net/usuariosAsignaturas/usuario-asignatura?idUsuario='+user,
       {
         method: 'GET',
         headers: {
@@ -48,6 +54,7 @@ export default class Asignaturas extends React.Component {
         this.setState({
           isLoading: false,
           dataSource: responseJson,
+          isProfesor: true,
         }, function(){
 
         });
@@ -60,27 +67,47 @@ export default class Asignaturas extends React.Component {
 
   saveNew() {
     
-    jsonArray = this.state.dataSource
-    jsonArray.push(
+    var asignaturas = this.state.dataSource;
+    asignaturas.push(
       {
         Nombre_asignatura: this.state.abreviatura,
         Descripcion: this.state.nombre
       })
-    console.log(jsonArray)
-    this.setState({ showNewDialog: false})
-
+    this.setState({ showNewDialog: false, dataSource: asignaturas});
     return fetch('https://us-central1-odsi-gestiontiempos.cloudfunctions.net/asignaturas/addAsignatura', {
       method: 'POST',
       headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
+                'Authorization': 'Bearer ODSI18',
+                'Content-Type': 'application/json',
+              },
       body: JSON.stringify({
         idAsignatura: this.state.abreviatura,
         idNombre: this.state.abreviatura,
         idDescripcion: this.state.nombre
       }),
-    }).then(response => this.setState({ showNewDialog: false, dataSource: jsonArray }), alert('SAVED'))
+    }).then(response => {
+        
+        var usuarioAsignaturas = [];
+        var abreviatura = this.state.abreviatura;
+        usuarioAsignaturas.push({"idUsuario": user, "idAsignatura": abreviatura});
+        var alumnos = this.state.alumnos.split(',');
+        alumnos.forEach(function(alumno) {
+          usuarioAsignaturas.push({"idUsuario": alumno, "idAsignatura": abreviatura});
+        });
+
+
+        return fetch('https://us-central1-odsi-gestiontiempos.cloudfunctions.net/usuariosAsignaturas/usuario-asignatura-multiple', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ODSI18',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(usuarioAsignaturas),
+            })
+        }
+      )
+
+  
   }
 
 
@@ -89,11 +116,8 @@ export default class Asignaturas extends React.Component {
 
     if(this.state.isLoading){
       return(
-        <View>
-           <StatusBar
-                barStyle = "light-content" 
-           />
-          <ActivityIndicator/>
+        <View style={styles.activityIndicator}>
+          <ActivityIndicator size={200} color={COLOR.teal300}/>
         </View>
       )
     }
@@ -108,6 +132,7 @@ export default class Asignaturas extends React.Component {
             <View style={{flex: 1}}>
               <FlatList
                 data={this.state.dataSource}
+                extraData={this.state}
                 renderItem={({item}) => 
                   <Card>
                       <ListItem
@@ -154,7 +179,14 @@ export default class Asignaturas extends React.Component {
               </Dialog>
               </View>
             </Modal>
-            <ActionButton onPress={() => this.setState({ showNewDialog: true, abreviatura: null, nombre: null, alumnos: null })}/>
+            {
+                this.state.isProfesor ?
+
+                <ActionButton onPress={() => this.setState({ showNewDialog: true, abreviatura: null, nombre: null, alumnos: null })}/>
+                : null
+
+            }
+            
             
           </View>
         </ThemeProvider>
