@@ -20,16 +20,22 @@ class LoginForm extends Component {
         }
     }
 
-    onLogin=()=>{
-
+    onLogin = () => {
+        firebase.auth().signInAndRetrieveDataWithEmailAndPassword(this.state.email, this.state.password)
+            .then((loggedInUser) => {
+                console.log(`Login with user : ${JSON.stringify(loggedInUser)}`);
+            }).catch((error) => {
+                console.log(`Login fail with error: ${error}`);
+            });
     }
 
+    
     onRegister=()=>{
 
         firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(this.state.email,this.state.password)
         .then((loggedInUser) => {
         this.setState({ user: loggedInUser })
-                console.log(`Register with user : ${JSON.stringify(loggedInUser.toJSON())}`);
+                console.log(`Register with user : ${JSON.stringify(loggedInUser)}`);
             }).catch((error) => {
                 console.log(`Register fail with error: ${error}`);
             });
@@ -61,7 +67,7 @@ class LoginForm extends Component {
                 />
                 <TouchableHighlight
                     style={[styles.loginButton, styles.button]}
-                    
+                    onPress={this.onLogin}
                 >
                     <Text 
                         style={styles.textButton}
