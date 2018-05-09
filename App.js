@@ -16,16 +16,15 @@ import {NativeModules, StatusBar,
 } from 'react-native';
 import Drawer from './src/Drawer';
 import Container from './src/Container';
+import MainTabNavigator from './src/routes';
+
 // components
 import {
-    ActionButton,
     Avatar,
-    ListItem,
     Toolbar,
-    BottomNavigation,
     Icon,
-    COLOR, ThemeProvider,
-
+    COLOR, ThemeProvider,ActionButton,
+    ListItem,
 } from 'react-native-material-ui';
 
 import Config from 'react-native-config';
@@ -40,12 +39,11 @@ const uiTheme = {
     },
 };
 //import LoginForm from './src/login/LoginForm';
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+
+
+const UP = 1;
+const DOWN = -1;
+
 const propTypes = {
     navigation: PropTypes.shape({
         goBack: PropTypes.func.isRequired,
@@ -66,11 +64,68 @@ export default class App extends Component<Props> {
           searchText: '',
           active: 'people',
           moveAnimated: new Animated.Value(0),
+          initialView:null,
+          userLoaded:false
       };
   }
 
+  static renderScene(route, navigator) {
+      return (
+          <Container>
+              <StatusBar backgroundColor="rgba(0, 0, 0, 0.2)" translucent />
+              <View style={{ backgroundColor: COLOR.green500, height: 24 }} />
+              <route.Page
+                  route={route}
+                  navigator={navigator}
+              />
+          </Container>
+      );
+  }
+
+  static configureScene(route) {
+      return route.animationType || Navigator.SceneConfigs.FloatFromRight;
+  }
+
+  onAvatarPressed = (value) => {
+      const { selected } = this.state;
+
+      const index = selected.indexOf(value);
+
+      if (index >= 0) {
+          // remove item
+          selected.splice(index, 1);
+      } else {
+          // add item
+          selected.push(value);
+      }
+
+      this.setState({ selected });
+  }
+
+  show = () => {
+      Animated.timing(this.state.moveAnimated, {
+          toValue: 0,
+          duration: 225,
+          easing: Easing.bezier(0.0, 0.0, 0.2, 1),
+          useNativeDriver: Platform.OS === 'android',
+      }).start();
+  }
+  hide = () => {
+      Animated.timing(this.state.moveAnimated, {
+          toValue: 56, // because the bottom navigation bar has height set to 56
+          duration: 195,
+          easing: Easing.bezier(0.4, 0.0, 0.6, 1),
+          useNativeDriver: Platform.OS === 'android',
+      }).start();
+  }
+
+
   componentWillMount() {
-        firebase.initializeApp({
+
+    if (UIManager.setLayoutAnimationEnabledExperimental) {
+        UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+    /*    firebase.initializeApp({
             apiKey: 'AIzaSyDoWGVZpr_u5SKVQk3zNaQ-t98i0JWdzvw',
             authDomain: 'odsi-gestiontiempos.firebaseapp.com',
             databaseURL: 'https://odsi-gestiontiempos.firebaseio.com',
@@ -78,6 +133,8 @@ export default class App extends Component<Props> {
             storageBucket: 'odsi-gestiontiempos.appspot.com',
             messagingSenderId: '921623046756'
         });
+*/
+
     }
     renderToolbar = () => {
         if (this.state.selected.length > 0) {
@@ -127,18 +184,26 @@ export default class App extends Component<Props> {
                 centerElement={title}
                 onPress={() => this.props.navigation.navigate(route)}
             />
-
         );
     }
   render() {
     return (
 
       <ThemeProvider uiTheme={uiTheme}>
-        <Container>
+      <MainTabNavigator ref={(nav) => { this.navigator = nav; }} />
+      { /*<Navigator
+          configureScene={App.configureScene}
+          initialRoute={routes.home}
+          ref={this.onNavigatorRef}
+          renderScene={App.renderScene}
+      /> */}
+
+
+        {/*<Container>
           {this.renderToolbar()}
           <View style={styles.container}>
             <Text style={styles.welcome}>
-              Welcome to React asdasdasd Prasdoyecta!
+              Welcome to React Proyecto ODSI!
             </Text>
             <Text style={styles.instructions}>
               To get started, edit App.js
@@ -149,6 +214,7 @@ export default class App extends Component<Props> {
           </View>
 
         </Container>
+      */}
       </ThemeProvider>
     );
   }
@@ -173,3 +239,4 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+App.propTypes = propTypes;
