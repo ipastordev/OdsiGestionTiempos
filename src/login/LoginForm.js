@@ -3,12 +3,37 @@ import { View, Button , Text, StyleSheet,TextInput,TouchableHighlight} from 'rea
 //import  TitledInput  from '../component/TitledInput';
 
 import { Toolbar } from 'react-native-material-ui';
-
+import firebase from 'react-native-firebase';
 import Container from '../Container';
-import { grey } from 'ansi-colors';
 
 class LoginForm extends Component {
     state = { email: '', password: '' };
+
+    constructor(props){
+        super(props);
+        this.state={
+            email:'',
+            password:'',
+            response:'',
+            isAuthenticated:false,
+            user:null,
+        }
+    }
+
+    onLogin=()=>{
+
+    }
+
+    onRegister=()=>{
+
+        firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(this.state.email,this.state.password)
+        .then((loggedInUser) => {
+        this.setState({ user: loggedInUser })
+                console.log(`Register with user : ${JSON.stringify(loggedInUser.toJSON())}`);
+            }).catch((error) => {
+                console.log(`Register fail with error: ${error}`);
+            });
+    }
 
     render() {
         return (
@@ -22,15 +47,21 @@ class LoginForm extends Component {
                     placeholderTextColor="grey"
                     placeholder="Email"
                     style={styles.inputText}
+                    autoCapitalize='none'
+                    onChangeText={(email) => {this.setState({email})}}
                 />
                 <TextInput
                     placeholderTextColor="grey"
                     placeholder="Password"
                     style={styles.inputText}
                     password={true}
+                    secureTextEntry={true}
+                    onChangeText={(password) => {this.setState({password})}}
+
                 />
                 <TouchableHighlight
                     style={[styles.loginButton, styles.button]}
+                    
                 >
                     <Text 
                         style={styles.textButton}
@@ -38,9 +69,10 @@ class LoginForm extends Component {
                 </TouchableHighlight>
                 <TouchableHighlight
                     style={[styles.singupButton, styles.button]}
+                    onPress={this.onRegister}
                 >
                     <Text style={styles.textButton}
-                    >Singup</Text>
+                    >Registro</Text>
                 </TouchableHighlight>
             </Container>
         );
