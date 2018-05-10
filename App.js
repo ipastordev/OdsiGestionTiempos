@@ -13,9 +13,6 @@ const uiTheme = {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        paddingTop: 24,
-    },
     textContainer: {
         paddingHorizontal: 16,
         paddingBottom: 16
