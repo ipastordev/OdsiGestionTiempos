@@ -19,10 +19,12 @@ import Drawer from './Drawer';
 // import Toolbar from './Toolbars';
 
 import LoginForm from './Login/LoginForm';
+import Asignaturas from './Asignaturas/Asignaturas';
 
 const AppNavigator = StackNavigator({
     home: { screen: Home },
     loginForm:{screen:LoginForm},
+    asignaturas:{screen:Asignaturas},
     /*actionButton: { screen: ActionButton },
     actionButtonToolbar: { screen: ActionButtonToolbar },
     actionButtonSpeedDial: { screen: ActionButtonSpeedDial },

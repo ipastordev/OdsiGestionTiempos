@@ -4,6 +4,7 @@ import { View, Button , Text, StyleSheet,TextInput,TouchableHighlight} from 'rea
 
 import { Toolbar } from 'react-native-material-ui';
 import firebase from 'react-native-firebase';
+import routes from '../routes';
 import Container from '../Container';
 
 class LoginForm extends Component {
@@ -24,6 +25,7 @@ class LoginForm extends Component {
         firebase.auth().signInAndRetrieveDataWithEmailAndPassword(this.state.email, this.state.password)
             .then((loggedInUser) => {
                 console.log(`Login with user : ${JSON.stringify(loggedInUser)}`);
+                this.props.navigation.navigate('asignaturas',{user:loggedInUser});
             }).catch((error) => {
                 console.log(`Login fail with error: ${error}`);
             });
