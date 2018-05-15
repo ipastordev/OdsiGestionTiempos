@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { FlatList, ActivityIndicator, Text, View, StyleSheet, StatusBar, Modal, TextInput} from 'react-native';
-import { COLOR, ThemeProvider, Toolbar, Subheader, Card, ListItem, 
+import { COLOR, Toolbar, Subheader, Card, ListItem, 
           ActionButton, Dialog, DialogDefaultActions } from 'react-native-material-ui';
-
-//const user = "us6"
+import Container from '../Container';
 
 
 const uiTheme = {
@@ -121,15 +120,24 @@ export default class Asignaturas extends Component {
 
     if(this.state.isLoading){
       return(
-        <View style={styles.activityIndicator}>
-          <ActivityIndicator size={200} color={COLOR.teal300}/>
+        <View style={{flex: 1}}>
+          <Container>
+            <View style={{flex: 1}}>
+              <View style={styles.container}>
+                <Toolbar centerElement="Gestor de Tiempos" />
+              </View>
+              <View style={styles.activityIndicator}>
+                <ActivityIndicator size={100} color={COLOR.teal300}/>
+              </View>
+            </View>
+          </Container>
         </View>
       )
     }
 
     return(
       <View style={{flex: 1}}>
-        <ThemeProvider uiTheme={uiTheme}>
+        <Container>
           <View style={{flex: 1}}>
             <View style={styles.container}>
               <Toolbar centerElement="Gestor de Tiempos" />
@@ -194,7 +202,7 @@ export default class Asignaturas extends Component {
             
             
           </View>
-        </ThemeProvider>
+        </Container>
       </View>
     );
   }

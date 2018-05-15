@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, Button , Text, StyleSheet,TextInput,TouchableHighlight} from 'react-native';
 //import  TitledInput  from '../component/TitledInput';
 
-import { Toolbar } from 'react-native-material-ui';
+import { COLOR, ThemeProvider, Toolbar } from 'react-native-material-ui';
 import firebase from 'react-native-firebase';
 import routes from '../routes';
 import Container from '../Container';
