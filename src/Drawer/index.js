@@ -4,6 +4,7 @@ import { PropTypes } from 'prop-types';
 
 import { Avatar, Drawer, Toolbar } from 'react-native-material-ui';
 import Container from '../Container';
+import firebase from 'react-native-firebase';
 
 const styles = StyleSheet.create({
     container: {
@@ -21,28 +22,46 @@ const propTypes = {
 };
 
 class DrawerSpec extends Component {
+    state = { currentUser: null }
+
+
+    componentWillMount(){
+        const { currentUser } = firebase.auth()
+    
+        this.setState({ currentUser })
+      }
+
+logOut(){
+    try {
+        firebase.auth().signOut()
+        this.props.navigation.navigate('loginForm')
+    } catch (error) {
+    console.log(error)
+}
+
+    }
     render() {
+
+        const { currentUser } = this.state
+    //alert(JSON.stringify(currentUser))
         return (
             <Container>
                 <Toolbar
                     leftElement="arrow-back"
                     onLeftElementPress={() => this.props.navigation.goBack()}
-                    centerElement="Dialog"
+                    centerElement="Menú"
                 />
                 <View style={styles.container}>
                     <Drawer>
                         <Drawer.Header >
                             <Drawer.Header.Account
                                 avatar={<Avatar text="A" />}
-                                accounts={[
-                                    { avatar: <Avatar text="B" />, key: 'b' },
-                                    { avatar: <Avatar text="C" />, key: 'c' },
-                                ]}
+                               
                                 footer={{
                                     dense: true,
                                     centerElement: {
-                                        primaryText: 'Reservio',
-                                        secondaryText: 'business@email.com',
+                                        primaryText: currentUser.displayName != null?currentUser.displayName.toString():'',
+                                        secondaryText: currentUser.email.toString(),
                                     },
                                     rightElement: 'arrow-drop-down',
                                 }}
@@ -53,14 +72,13 @@ class DrawerSpec extends Component {
                             items={[
                                 { icon: 'bookmark-border', value: 'Notifications' },
                                 { icon: 'today', value: 'Calendar', active: true },
-                                { icon: 'people', value: 'Clients' },
                             ]}
                         />
                         <Drawer.Section
                             title="Personal"
                             items={[
-                                { icon: 'info', value: 'Info' },
                                 { icon: 'settings', value: 'Settings' },
+                                { icon: 'info', value: 'Cerrar Sesión',onPress:this.logOut },
                             ]}
                         />
                     </Drawer>

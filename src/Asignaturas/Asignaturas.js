@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { FlatList, ActivityIndicator, Text, View, StyleSheet, StatusBar, Modal, TextInput} from 'react-native';
+import { PropTypes } from 'prop-types';
+import { ToastAndroid,FlatList, ActivityIndicator, Text, StyleSheet, StatusBar, Modal, TextInput,Platform,Animated, Easing,View} from 'react-native';
 import { COLOR, Toolbar, Subheader, Card, ListItem, 
           ActionButton, Dialog, DialogDefaultActions } from 'react-native-material-ui';
 import Container from '../Container';
+import firebase from 'react-native-firebase';
 
 
 const uiTheme = {
@@ -29,22 +31,50 @@ const styles = StyleSheet.create({
     },
 });
 
-export default class Asignaturas extends Component {
+const UP = 1;
+const DOWN = -1;
 
+
+const propTypes = {
+    navigation: PropTypes.shape({
+        goBack: PropTypes.func.isRequired,
+        navigate: PropTypes.func.isRequired,
+    }).isRequired,
+};
+
+export default class Asignaturas extends Component {
+  state = { currentUser: null }
   constructor(props){
    
     super(props);
-    this.state ={ isLoading: true, showNewDialog: false}
+    this.state ={ 
+      isLoading: true, 
+      showNewDialog: false,
+      selected: [],  
+      searchText: '',
+      active: 'people',
+      moveAnimated: new Animated.Value(0),
+      userData:[],
+    }
   }
 
-  
+  componentWillMount(){
+    const { currentUser } = firebase.auth()
+
+    this.setState({ currentUser })
+  }
 
   componentDidMount(){
-
+    /*const { userData } = this.state;
     const { navigation } = this.props;
     const userObj = navigation.getParam('user', 'NO-ID');
     const user = userObj.user._auth._user.providerData[0].uid;
-    return fetch('https://us-central1-odsi-gestiontiempos.cloudfunctions.net/usuariosAsignaturas/usuario-asignatura?idUsuario='+user,
+    */
+   
+    /*userData.push(user); 
+    this.setState({ userData });*/
+
+    return fetch('https://us-central1-odsi-gestiontiempos.cloudfunctions.net/usuariosAsignaturas/usuario-asignatura?idUsuario='+this.state.currentUser,
       {
         method: 'GET',
         headers: {
@@ -69,6 +99,7 @@ export default class Asignaturas extends Component {
       });
   }
 
+  
   saveNew() {
     
     var asignaturas = this.state.dataSource;
@@ -113,11 +144,98 @@ export default class Asignaturas extends Component {
 
   
   }
+  onAvatarPressed = (value) => {
+    const { selected } = this.state;
 
+    const index = selected.indexOf(value);
 
+    if (index >= 0) {
+        // remove item
+        selected.splice(index, 1);
+    } else {
+        // add item
+        selected.push(value);
+    }
+
+    this.setState({ selected });
+}
+onScroll = (ev) => {
+    const currentOffset = ev.nativeEvent.contentOffset.y;
+
+    const sub = this.offset - currentOffset;
+
+    // don't care about very small moves
+    if (sub > -2 && sub < 2) {
+        return;
+    }
+
+    this.offset = ev.nativeEvent.contentOffset.y;
+
+    const currentDirection = sub > 0 ? UP : DOWN;
+
+    if (this.scrollDirection !== currentDirection) {
+        this.scrollDirection = currentDirection;
+
+        this.setState({
+            bottomHidden: currentDirection === DOWN,
+        });
+    }
+}
+show = () => {
+    Animated.timing(this.state.moveAnimated, {
+        toValue: 0,
+        duration: 225,
+        easing: Easing.bezier(0.0, 0.0, 0.2, 1),
+        useNativeDriver: Platform.OS === 'android',
+    }).start();
+}
+hide = () => {
+    Animated.timing(this.state.moveAnimated, {
+        toValue: 56, // because the bottom navigation bar has height set to 56
+        duration: 195,
+        easing: Easing.bezier(0.4, 0.0, 0.6, 1),
+        useNativeDriver: Platform.OS === 'android',
+    }).start();
+}
+  renderToolbar = () => {
+    const { currentUser } = this.state
+    if (this.state.selected.length > 0) {
+        return (
+            <Toolbar
+                key="toolbar"
+                leftElement="clear"
+                onLeftElementPress={() => this.setState({ selected: [] })}
+                centerElement={this.state.selected.length.toString()}
+                rightElement={['delete']}
+                style={{
+                    container: { backgroundColor: 'white' },
+                    titleText: { color: 'rgba(0,0,0,.87)' },
+                    leftElement: { color: 'rgba(0,0,0,.54)' },
+                    rightElement: { color: 'rgba(0,0,0,.54)' },
+                }}
+            />
+        );
+    }
+    return (
+      
+        <Toolbar
+            key="toolbar"
+            leftElement="menu"
+            onLeftElementPress={() => this.props.navigation.navigate('drawer')}
+            centerElement="Gestor de Tiempos"
+            searchable={{
+                autoFocus: true,
+                placeholder: 'Search',
+                onChangeText: value => this.setState({ searchText: value }),
+                onSearchClosed: () => this.setState({ searchText: '' }),
+            }}
+        />
+    );
+}
 
   render(){
-
+    /*const { currentUser } = this.state
+    alert(JSON.stringify(currentUser))*/
     if(this.state.isLoading){
       return(
         <View style={{flex: 1}}>
@@ -138,10 +256,9 @@ export default class Asignaturas extends Component {
     return(
       <View style={{flex: 1}}>
         <Container>
+           {this.renderToolbar()}
           <View style={{flex: 1}}>
-            <View style={styles.container}>
-              <Toolbar centerElement="Gestor de Tiempos" />
-            </View>
+            
             <View style={{flex: 1}}>
               <FlatList
                 data={this.state.dataSource}

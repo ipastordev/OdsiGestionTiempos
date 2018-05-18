@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import { View, Button , Text, StyleSheet,TextInput,TouchableHighlight} from 'react-native';
 //import  TitledInput  from '../component/TitledInput';
 
-import { COLOR, ThemeProvider, Toolbar } from 'react-native-material-ui';
+import { COLOR, ThemeProvider,Toolbar } from 'react-native-material-ui';
 import firebase from 'react-native-firebase';
-import routes from '../routes';
 import Container from '../Container';
 
 class LoginForm extends Component {
@@ -18,6 +17,7 @@ class LoginForm extends Component {
             response:'',
             isAuthenticated:false,
             user:null,
+            msjError:''
         }
     }
 
@@ -25,21 +25,24 @@ class LoginForm extends Component {
         firebase.auth().signInAndRetrieveDataWithEmailAndPassword(this.state.email, this.state.password)
             .then((loggedInUser) => {
                 console.log(`Login with user : ${JSON.stringify(loggedInUser)}`);
-                this.props.navigation.navigate('asignaturas',{user:loggedInUser});
+                
+                    this.props.navigation.navigate('asignaturas',{user:loggedInUser})
+                
             }).catch((error) => {
                 console.log(`Login fail with error: ${error}`);
             });
     }
 
-    
     onRegister=()=>{
 
         firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(this.state.email,this.state.password)
         .then((loggedInUser) => {
-        this.setState({ user: loggedInUser })
+                this.setState({ user: loggedInUser });
                 console.log(`Register with user : ${JSON.stringify(loggedInUser)}`);
+                    this.props.navigation.navigate('asignaturas',{user:loggedInUser})
             }).catch((error) => {
                 console.log(`Register fail with error: ${error}`);
+                this.setState({msj:error});
             });
     }
 
@@ -47,8 +50,7 @@ class LoginForm extends Component {
         return (
             <Container>
                 <Toolbar
-                    leftElement="arrow-back"
-                    onLeftElementPress={() => this.props.navigation.goBack()}
+                   
                     centerElement="Inicio de Sesión"
                 />
                 <TextInput

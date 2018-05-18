@@ -16,16 +16,16 @@ const uiTheme = {
         primaryColor: COLOR.teal300,
         accentColor: COLOR.red500,
     },
-};
+};			 
 
 class Container extends Component {
     render() {
         return (
-            <ThemeProvider uiTheme={uiTheme}>
-                <View style={styles.container}>
-                    {this.props.children}
-                </View>
-            </ThemeProvider>
+			<ThemeProvider uiTheme={uiTheme}>								 
+            <View style={styles.container}>
+                {this.props.children}
+            </View>
+			</ThemeProvider>				
         );
     }
 }

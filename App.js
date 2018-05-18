@@ -28,7 +28,7 @@ import {
 } from 'react-native-material-ui';
 
 import Config from 'react-native-config';
-import firebase from 'firebase';
+import firebase from 'react-native-firebase';
 
 const UIManager = NativeModules.UIManager;
 
@@ -67,9 +67,24 @@ export default class App extends Component<Props> {
           initialView:null,
           userLoaded:false
       };
+ 
   }
+/*
+  
+  getInitialView(){
+    firebase.auth().onAuthStateChanged((user)=>{
+      let initialView= user ? 'home':'asignaturas'
 
+      this.setState({
+        userLoaded:true,
+        initialView
+      })
+    })
+
+}
+*/
   static renderScene(route, navigator) {
+
       return (
           <Container>
               <StatusBar backgroundColor="rgba(0, 0, 0, 0.2)" translucent />
@@ -85,40 +100,6 @@ export default class App extends Component<Props> {
   static configureScene(route) {
       return route.animationType || Navigator.SceneConfigs.FloatFromRight;
   }
-
-  onAvatarPressed = (value) => {
-      const { selected } = this.state;
-
-      const index = selected.indexOf(value);
-
-      if (index >= 0) {
-          // remove item
-          selected.splice(index, 1);
-      } else {
-          // add item
-          selected.push(value);
-      }
-
-      this.setState({ selected });
-  }
-
-  show = () => {
-      Animated.timing(this.state.moveAnimated, {
-          toValue: 0,
-          duration: 225,
-          easing: Easing.bezier(0.0, 0.0, 0.2, 1),
-          useNativeDriver: Platform.OS === 'android',
-      }).start();
-  }
-  hide = () => {
-      Animated.timing(this.state.moveAnimated, {
-          toValue: 56, // because the bottom navigation bar has height set to 56
-          duration: 195,
-          easing: Easing.bezier(0.4, 0.0, 0.6, 1),
-          useNativeDriver: Platform.OS === 'android',
-      }).start();
-  }
-
 
   componentWillMount() {
 
@@ -186,37 +167,14 @@ export default class App extends Component<Props> {
             />
         );
     }
-  render() {
-    return (
 
-      <ThemeProvider uiTheme={uiTheme}>
-      <MainTabNavigator ref={(nav) => { this.navigator = nav; }} />
-      { /*<Navigator
-          configureScene={App.configureScene}
-          initialRoute={routes.home}
-          ref={this.onNavigatorRef}
-          renderScene={App.renderScene}
-      /> */}
+    render() {
+        return (
 
-
-        {/*<Container>
-          {this.renderToolbar()}
-          <View style={styles.container}>
-            <Text style={styles.welcome}>
-              Welcome to React Proyecto ODSI!
-            </Text>
-            <Text style={styles.instructions}>
-              To get started, edit App.js
-            </Text>
-            <Text style={styles.instructions}>
-              {instructions}
-            </Text>
-          </View>
-
-        </Container>
-      */}
-      </ThemeProvider>
-    );
+            <ThemeProvider uiTheme={uiTheme}>
+                <MainTabNavigator ref={(nav) => { this.navigator = nav; }} />
+            </ThemeProvider>
+        );
   }
 }
 

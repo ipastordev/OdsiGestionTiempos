@@ -6,7 +6,7 @@ import Home from './App/Home.react';
 //import ActionButtonToolbar from './ActionButton/ActionButtonToolbar.react';
 //import ActionButtonSpeedDial from './ActionButton/ActionButtonSpeedDial.react';
 // import Avatar from './Avatar';
-// import BottomNavigation from './BottomNavigation';
+// import BotstomNavigation from './BottomNavigation';
 // import Badge from './Badge';
 // import Button from './Button';
 // import Card from './Card';
@@ -17,14 +17,16 @@ import Drawer from './Drawer';
 // import List from './List';
 // import RadioButton from './RadioButton';
 // import Toolbar from './Toolbars';
+import Prueba from './prueba';
 
 import LoginForm from './Login/LoginForm';
-import Asignaturas from './Asignaturas/Asignaturas';
+import Asignaturas from './Asignaturas/Asignaturas';												
 
 const AppNavigator = StackNavigator({
     home: { screen: Home },
     loginForm:{screen:LoginForm},
-    asignaturas:{screen:Asignaturas},
+    prueba:{screen:Prueba},
+	asignaturas:{screen:Asignaturas},
     /*actionButton: { screen: ActionButton },
     actionButtonToolbar: { screen: ActionButtonToolbar },
     actionButtonSpeedDial: { screen: ActionButtonSpeedDial },
