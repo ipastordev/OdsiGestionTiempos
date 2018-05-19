@@ -35,7 +35,7 @@ class LoginForm extends Component {
 
     onRegister=()=>{
 
-        firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(this.state.email,this.state.password)
+    {/*    firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(this.state.email,this.state.password)
         .then((loggedInUser) => {
                 this.setState({ user: loggedInUser });
                 console.log(`Register with user : ${JSON.stringify(loggedInUser)}`);
@@ -44,6 +44,9 @@ class LoginForm extends Component {
                 console.log(`Register fail with error: ${error}`);
                 this.setState({msj:error});
             });
+
+        */}
+        this.props.navigation.navigate('register',{});
     }
 
     render() {
